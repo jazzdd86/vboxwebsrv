@@ -5,6 +5,7 @@ RUN apk add --no-cache bash openssh-client
 
 ENV PORT 5678
 ENV USE_KEY 0
+ENV SSH_PORT 22
 
 # only expose default vboxwebsrv port
 EXPOSE 18083

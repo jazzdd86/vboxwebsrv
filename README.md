@@ -94,3 +94,6 @@ The name of the configuration variable must be extended with "CONF_". See exampl
 ```bash
 $ docker run -it --name=vbox_websrv_1 --restart=always -e USE_KEY=1 -e CONF_browserRestrictFolders="/data,/home" jazzdd/vboxwebsrv vbox@10.1.2.3
 ```
+
+## Different SSH Port
+You could also use a different SSH Port (default port is 22) by using `-e SSH_PORT=portNumber` environment variable.
