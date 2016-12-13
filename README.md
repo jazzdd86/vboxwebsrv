@@ -79,6 +79,20 @@ VirtualBox web service 5.0.14_OSE r105127 linux.amd64 (Jan 22 2016 00:45:18) rel
 00:00:00.157930 SQPmp    Socket connection successful: host = default (localhost), port = 5678, master socket = 8
 ```
 
+### Avoid recreating SSH Keys when recreating the vboxwebsrv container
+After creating the key pair for the first time, you can copy the ssh directory from the container to the host file system with:
+```bash
+$ docker cp vbox_websrv_1:/root/.ssh/ ssh/
+```
+You can now recreate the container with either a seperate docker volume containing the ssh keys or use the -v flag within your docker run command:
+```bash
+$ docker run -it --name=vbox_websrv_1 --restart=always -e USE_KEY=1 -v /path/to/ssh:/root/.ssh jazzdd/vboxwebsrv vbox@10.1.2.3 
+```
+**Caution:**
+the ssh folder must contain id_rsa, id_rsa.pub and the known_hosts file - only than the container can be recreated without any further steps 
+
+
+
 ## Starting phpVirtualBox
 The next step would be linking your `vbox_websrv_1` container to your phpVirtualBox container. Please see [jazzdd86/phpVirtualbox](https://github.com/jazzdd86/phpVirtualbox) for details, a common way to link them together looks like this:
 
