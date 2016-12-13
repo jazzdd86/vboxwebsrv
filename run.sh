@@ -10,4 +10,5 @@ if [ "$USE_KEY" != "0" ] && [ ! -f ~/.ssh/id_rsa ]; then
     read -p "Press [Enter] to contiue..."
 fi
 
+ssh -p $SSH_PORT $1 "killall vboxwebsrv"
 ssh -p $SSH_PORT -L 0.0.0.0:18083:localhost:$PORT $1 "killall vboxwebsrv; vboxwebsrv -p $PORT -A null"
