@@ -11,4 +11,4 @@ if [ "$USE_KEY" != "0" ] && [ ! -f ~/.ssh/id_rsa ]; then
 fi
 
 ssh -p $SSH_PORT $1 "killall vboxwebsrv"
-ssh -p $SSH_PORT -L 0.0.0.0:18083:localhost:$PORT $1 "killall vboxwebsrv; vboxwebsrv -p $PORT -A null"
+ssh -p $SSH_PORT -L 0.0.0.0:18083:localhost:$PORT $1 "killall vboxwebsrv; vboxwebsrv -p $PORT -A null -H $(awk -F@ '{print $2}' <<<$1)"
