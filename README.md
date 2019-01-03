@@ -7,6 +7,7 @@ This is particularly intended for use with the [jazzdd86/phpVirtualbox](https://
 This is a fork of the original [clue/docker-vboxwebsrv](https://github.com/clue/docker-vboxwebsrv) image. It extends the original one with the possibilty to connect to the server via ssh keys authentication.
 
 ## Usage with ssh password authentication
+
 The recommended way to run this container looks like this:
 
 ```bash
@@ -15,12 +16,13 @@ $ docker run -it --name=vbox_websrv_1 --restart=always jazzdd/vboxwebsrv vbox@10
 
 This will start an interactive container that will establish a connection to the given host. The host `10.1.2.3` is your computer that VirtualBox is installed on.
 
-To establish an encrypted SSH connection it will likely ask for your password for user `vbox`. This is the user that runs your virtual machines (VMs).
+To establish an encrypted SSH connection it will likely ask for your password for user `vbox`. This is the user that runs your virtual machines (VMs) and is in the vboxusers group.
 
 Once connected, it will launch a temporary instance of the  `vboxwebsrv` program that comes with VirtualBox. This will be exposed through the SSH tunnel to your docker container and will terminate when your container terminates.
 
 ## Usage with ssh key authentication
-If the login via password is not allowed on the ssh server, the image provides the possibility to use ssh key authentication.
+
+To avoid typing in your password everytime the container is started, the image provides the possibility to use ssh key authentication.
 
 ```bash
 $ docker run -it --name=vbox_websrv_1 --restart=always -e USE_KEY=1 jazzdd/vboxwebsrv vbox@10.1.2.3
@@ -70,8 +72,8 @@ VirtualBox web service 5.0.14_OSE r105127 linux.amd64 (Jan 22 2016 00:45:18) rel
 00:00:00.000095 main     OS Product: Linux
 00:00:00.000096 main     OS Release: 4.4.1-2-ARCH
 00:00:00.000097 main     OS Version: #1 SMP PREEMPT Wed Feb 3 13:12:33 UTC 2016
-00:00:00.000122 main     DMI Product Name:         
-00:00:00.000131 main     DMI Product Version:         
+00:00:00.000122 main     DMI Product Name:
+00:00:00.000131 main     DMI Product Version:
 00:00:00.000196 main     Host RAM: 7874MB total, 4278MB available
 00:00:00.000200 main     Executable: /usr/lib/virtualbox/vboxwebsrv
 00:00:00.000201 main     Process ID: 31150
@@ -80,34 +82,49 @@ VirtualBox web service 5.0.14_OSE r105127 linux.amd64 (Jan 22 2016 00:45:18) rel
 ```
 
 ### Avoid recreating SSH Keys when recreating the vboxwebsrv container
+
 After creating the key pair for the first time, you can copy the ssh directory from the container to the host file system with:
+
 ```bash
 $ docker cp vbox_websrv_1:/root/.ssh/ ssh/
 ```
+
 You can now recreate the container with either a seperate docker volume containing the ssh keys or use the -v flag within your docker run command:
+
 ```bash
 $ docker run -it --name=vbox_websrv_1 --restart=always -e USE_KEY=1 -v /path/to/ssh:/root/.ssh jazzdd/vboxwebsrv vbox@10.1.2.3 
 ```
+
 **Caution:**
 the ssh folder must contain id_rsa, id_rsa.pub and the known_hosts file - only than the container can be recreated without any further steps 
 
-
-
 ## Starting phpVirtualBox
-The next step would be linking your `vbox_websrv_1` container to your phpVirtualBox container. Please see [jazzdd86/phpVirtualbox](https://github.com/jazzdd86/phpVirtualbox) for details, a common way to link them together looks like this:
 
-```bash
-$ docker run -d --link vbox_websrv_1:MyComputer -p 80:80 jazzdd/phpvirtualbox
-```
-
-## Further configurations
-Environment variables can be used to configure phpVirtualBox for the server. All valid configuration options can be used (see [phpVirtualBox Wiki](https://sourceforge.net/p/phpvirtualbox/wiki/Home/)).
-
-The name of the configuration variable must be extended with "CONF_". See example below (for more information see [jazzdd86/phpVirtualbox](https://github.com/jazzdd86/phpVirtualbox)):
-
-```bash
-$ docker run -it --name=vbox_websrv_1 --restart=always -e USE_KEY=1 -e CONF_browserRestrictFolders="/data,/home" jazzdd/vboxwebsrv vbox@10.1.2.3
-```
+Now you can point your phpVirtualBox container to the vboxwebsrv container. Please see [jazzdd86/phpVirtualbox](https://github.com/jazzdd86/phpVirtualbox) for details
 
 ## Different SSH Port
+
 You could also use a different SSH Port (default port is 22) by using `-e SSH_PORT=portNumber` environment variable.
+
+## Docker Compose
+
+A docker compose file could look as follows:
+
+```yml
+version: '3'
+services:
+    vbox_websrv_1:
+        container_name: vbox_websrv_1
+        restart: always
+        volumes:
+            - "./ssh:/root/.ssh"
+        environment:
+            USE_KEY: 1
+            SSH_PORT: portNumber
+        image: jazzdd/vboxwebsrv
+        command: vbox@10.1.2.3
+```
+
+The USE_KEY option works only if a ssh keypair was created earlier with described method above.
+
+Both environment variables are optional.
