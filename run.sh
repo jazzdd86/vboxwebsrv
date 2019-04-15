@@ -10,7 +10,7 @@ if [ "$USE_KEY" != "0" ] && [ ! -f ~/.ssh/id_rsa ]; then
     read -p "Press [Enter] to contiue..."
 fi
 
-sshHost=$(awk -F@ '{print $2}' <<<$1)
+sshHost=127.0.0.1
 
 ssh -p $SSH_PORT $1 "killall vboxwebsrv"
 ssh -p $SSH_PORT -L 0.0.0.0:18083:$sshHost:$PORT $1 "killall vboxwebsrv; vboxwebsrv -p $PORT -A null -H $sshHost"
