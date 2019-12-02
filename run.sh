@@ -13,4 +13,4 @@ fi
 sshHost=$(awk -F@ '{print $2}' <<<$1)
 
 ssh -p $SSH_PORT $1 "killall vboxwebsrv"
-ssh -p $SSH_PORT -L 0.0.0.0:18083:$sshHost:$PORT $1 "killall vboxwebsrv; vboxwebsrv -p $PORT -A null -H $sshHost"
+ssh -p $SSH_PORT -L 0.0.0.0:18083:$sshHost:$PORT $1 "killall vboxwebsrv; \"$VBOXWEBSRVPATH\" -p $PORT -A null -H $sshHost"

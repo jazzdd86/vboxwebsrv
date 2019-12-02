@@ -106,6 +106,10 @@ Now you can point your phpVirtualBox container to the vboxwebsrv container. Plea
 
 You could also use a different SSH Port (default port is 22) by using `-e SSH_PORT=portNumber` environment variable.
 
+## Different remote vboxwebsrv path
+
+You can choose a different path for the remote vboxwebsrv by using `-e VBOXWEBSRVPATH=/path/to/vboxwebsrv` environment variable.
+
 ## Docker Compose
 
 A docker compose file could look as follows:
